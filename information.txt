@@ -7,3 +7,5 @@ Install Authlib for Flask to support OAuth/OIDC login
 Setup Folder structure
 
 Added Gmail Service Code
+
+Setup HTTPS

@@ -3,19 +3,20 @@
 ==Install Flask Framework==
 #1.Check Python Is available 
 python --version
-or:
+#or:
 py --version
 
 #2.Create Virtual where "venvname" c
 python -m venv venvname 
 
 #3.Activate Virtual Environment
-venvname\Scripts\Activate.ps1
-or:
-venvname/bin/Activate.ps1
-or:
+.\venvname\Scripts\Activate         
+#or:
 source venvname/bin/activate
-
+#If getting UnauthorizedAccess error first try:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+#then:
+.\venvname\Scripts\Activate  
 
 #4.Upgrade pip
 python -m pip install --upgrade pip
@@ -43,6 +44,11 @@ pip install requests
 #Install Python dot Enviroment for .env file
 pip install python-dotenv
 
+
+===Generate a Self-Signed Certificate
+pip install cryptography
+python generate_cert.py
+
 ===Save your installed packages===
 #Save all installed packages
 pip freeze > requirements.txt 
@@ -57,3 +63,9 @@ python, python  Enviroment
 Autopep8
 Pylance
 SQLite3 Editor (by yy0931)
+
+=============SETUP GIT USERNAME=============
+#Run the following command to set your username (replace Your Name but keep the quotes):
+git config --global user.name "Your Name"
+#Use code with caution.Run the following command to set your email (replace with your actual email):
+git config --global user.email "your.email@example.com"

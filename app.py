@@ -2,14 +2,14 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, render_template, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, session, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from models import db
-from services.gmail_service import GmailService
 from authlib.integrations.flask_client import OAuth
+from datetime import datetime
 
 # Initialize extensions
-oauth = OAuth() 
+oauth = OAuth()
 
 def create_app():
     app = Flask(__name__)
@@ -17,10 +17,10 @@ def create_app():
     # Configuration
     app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
     app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_PERMANENT'] = False
 
-    # DB Config
+    # Database Config
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLITE_DATABASE_URL")
-    #app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     # Email Configurations
@@ -36,44 +36,67 @@ def create_app():
     app.config['OAUTH2_CLIENT_ID'] = os.getenv('MICROSOFT_CLIENT_ID')
     app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('MICROSOFT_CLIENT_SECRET')
 
+    # Initialize extensions
     db.init_app(app)
     oauth.init_app(app)
     
     # Register Microsoft OAuth client
     oauth.register(
-    name='microsoft',
-    client_id=os.getenv('AZURE_CLIENT_ID'),
-    client_secret=os.getenv('AZURE_CLIENT_SECRET'),
-    authorize_url='https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
-    access_token_url='https://login.microsoftonline.com/common/oauth2/v2.0/token',
-    api_base_url='https://graph.microsoft.com/v1.0/',
-    jwks_uri='https://login.microsoftonline.com/common/discovery/v2.0/keys',
-    client_kwargs={
-        'scope': 'openid profile email User.Read',
-        'prompt': 'select_account'
-    }
+        name='microsoft',
+        client_id=os.getenv('AZURE_CLIENT_ID'),
+        client_secret=os.getenv('AZURE_CLIENT_SECRET'),
+        authorize_url='https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+        access_token_url='https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        api_base_url='https://graph.microsoft.com/v1.0/',
+        jwks_uri='https://login.microsoftonline.com/common/discovery/v2.0/keys',
+        client_kwargs={
+            'scope': 'openid profile email User.Read',
+            'prompt': 'select_account'
+        }
     )
+
+    # Register blueprints
+    from routes.account_routes import account_bp
+    from routes.main_routes import main_bp
     
-    app.gmail_service = GmailService(app)
-    
+    app.register_blueprint(account_bp)
+    app.register_blueprint(main_bp)
+
+    # Context processor for template variables
+    @app.context_processor
+    def utility_processor():
+        def get_year():
+            return datetime.now().year
+        return dict(current_year=get_year)
+
     return app
 
+# Create app instance
 app = create_app()
+
 
 # Create database tables
 with app.app_context():
     db.create_all()
+    print("Database tables created successfully!")
 
+# Error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
 
 if __name__ == '__main__':
     # Starts the local development server
-    app.run(debug=True)
-'''
-if __name__ == '__main__':
-    app.run(debug=True, ssl_context=('cert.pem', 'key.pem'), host='127.0.0.1', port=5000)
-'''
+    #app.run(debug=True, host='0.0.0.0', port=5000)
+    # Run with HTTPS
+    app.run(
+        debug=True, 
+        host='0.0.0.0', 
+        port=5000,
+        ssl_context=('localhost.crt', 'localhost.key')  # Path to your certificate files
+    )

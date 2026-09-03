@@ -1,12 +1,758 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>SmartShopper AI | DUT Student Budget Assistant</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main CSS (will be provided in Step 1B) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/LandingStyle.css') }}">
 </head>
 <body>
-    <h1>WELCOME TO THE LANDING PAGE</h1>
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="container">
+            <div class="navbar-brand">
+                <a href="/" class="brand-link">
+                    <i class="fas fa-robot brand-icon"></i>
+                    <span class="brand-text">Smart<span class="brand-highlight">Shopper</span></span>
+                </a>
+            </div>
+            
+            <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="toggle-bar"></span>
+                <span class="toggle-bar"></span>
+                <span class="toggle-bar"></span>
+            </button>
+
+            <div class="navbar-menu" id="navbarMenu">
+                <ul class="nav-links">
+                    <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+                
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
+                    
+                    {% if session.get('user_id') %}
+                        <!-- User is logged in -->
+                        <a href="{{ url_for('account_bp.dashboard') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-user"></i> Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('account_bp.microsoft_login') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== FLASH MESSAGES ==================== -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}" role="alert">
+                        <i class="fas fa-{% if category == 'success' %}check-circle{% elif category == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                        {{ message }}
+                        <button class="flash-close" aria-label="Dismiss message">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-graduation-cap"></i>
+                        DUT Student Budget Assistant
+                    </div>
+                    <h1 class="hero-title">
+                        Smart Shopping<br>
+                        <span class="gradient-text">Within Your Budget</span>
+                    </h1>
+                    <p class="hero-description">
+                        AI-powered shopping assistant that helps DUT students make informed purchases, 
+                        stick to their budget, and save time finding the best deals.
+                    </p>
+                    <div class="hero-actions">
+                        {% if session.get('user_id') %}
+                            <a href="{{ url_for('account_bp.dashboard') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-rocket"></i> Go to Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('account_bp.microsoft_login') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-microsoft"></i> Sign in with DUT4Life
+                            </a>
+                            <p class="hero-note">
+                                <i class="fas fa-shield-alt"></i> Secure DUT authentication
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" data-count="500">0</span>
+                            <span class="stat-label">Students Active</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-count="2500">0</span>
+                            <span class="stat-label">Products Compared</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-count="85">0</span>
+                            <span class="stat-label">% Savings Rate</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="hero-card glass-card">
+                        <div class="card-preview">
+                            <div class="preview-header">
+                                <i class="fas fa-search"></i>
+                                <span>Smart Search</span>
+                            </div>
+                            <div class="preview-body">
+                                <div class="preview-input">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <span>Budget: R500</span>
+                                </div>
+                                <div class="preview-input">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span>Looking for: Laptop</span>
+                                </div>
+                                <div class="preview-results">
+                                    <div class="result-item">
+                                        <i class="fas fa-laptop"></i>
+                                        <span>Asus Laptop - R4,999</span>
+                                        <span class="result-badge">-15%</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <i class="fas fa-laptop"></i>
+                                        <span>HP Laptop - R5,299</span>
+                                        <span class="result-badge">-8%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SERVICES SECTION ==================== -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">What We Offer</span>
+                <h2 class="section-title">Smart Features for Smart Students</h2>
+                <p class="section-description">
+                    Everything you need to make informed shopping decisions and stay within your budget
+                </p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card glass-card">
+                    <div class="service-icon" style="color: #03b5aa;">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="service-title">AI-Powered Search</h3>
+                    <p class="service-description">
+                        Simply enter your budget and what you're looking for. Our AI finds the best matches 
+                        across multiple stores instantly.
+                    </p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon" style="color: #ff8552;">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3 class="service-title">Smart Filters</h3>
+                    <p class="service-description">
+                        Filter by price, color, size, shipping cost, or location. Find products within 25km 
+                        of your residence.
+                    </p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon" style="color: #023436;">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3 class="service-title">Personalized Recommendations</h3>
+                    <p class="service-description">
+                        Based on your buying history and saved favorites. Get smarter recommendations 
+                        every time you shop.
+                    </p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon" style="color: #03b5aa;">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3 class="service-title">Save Favorites</h3>
+                    <p class="service-description">
+                        Save your preferred styles, colors, stores, and hobbies. We'll remember them for 
+                        future searches.
+                    </p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon" style="color: #ff8552;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="service-title">Budget Tracking</h3>
+                    <p class="service-description">
+                        Keep track of your spending and get alerts when you're approaching your monthly 
+                        budget limit.
+                    </p>
+                </div>
+                
+                <div class="service-card glass-card">
+                    <div class="service-icon" style="color: #023436;">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3 class="service-title">Multi-Store Comparison</h3>
+                    <p class="service-description">
+                        Compare prices across multiple stores and platforms. Never overpay for products 
+                        again.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== HOW IT WORKS ==================== -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Simple Process</span>
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-description">
+                    Get started in three easy steps and start saving money today
+                </p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4 class="step-title">Sign In</h4>
+                        <p class="step-description">
+                            Use your DUT4Life email to securely sign in with Microsoft authentication.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4 class="step-title">Set Your Budget</h4>
+                        <p class="step-description">
+                            Enter your monthly allowance and what items you're looking for.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4 class="step-title">Shop Smart</h4>
+                        <p class="step-description">
+                            Get AI-powered recommendations and find the best deals instantly.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="section-tag">About Us</span>
+                    <h2 class="section-title">Empowering DUT Students</h2>
+                    <p class="about-text">
+                        SmartShopper AI was created to help DUT students, especially those in university 
+                        residences, manage their monthly NSFAS allowances more effectively. We understand 
+                        the challenges of budgeting while trying to get the best value for your money.
+                    </p>
+                    <p class="about-text">
+                        Our AI-powered platform uses advanced algorithms to search across multiple stores, 
+                        compare prices, and provide personalized recommendations based on your shopping 
+                        history and preferences.
+                    </p>
+                    <div class="about-features">
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle" style="color: #03b5aa;"></i>
+                            <span>NSFAS allowance optimized</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle" style="color: #03b5aa;"></i>
+                            <span>Real-time price comparison</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle" style="color: #03b5aa;"></i>
+                            <span>Smart budget tracking</span>
+                        </div>
+                        <div class="about-feature">
+                            <i class="fas fa-check-circle" style="color: #03b5aa;"></i>
+                            <span>Personalized shopping experience</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-visual">
+                    <div class="about-stats-card glass-card">
+                        <div class="stat-circle">
+                            <span class="stat-circle-number">98%</span>
+                            <span class="stat-circle-label">Satisfaction Rate</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="about-stat-item">
+                            <span class="about-stat-value">R2.5M+</span>
+                            <span class="about-stat-label">Student Savings</span>
+                        </div>
+                        <div class="about-stat-item">
+                            <span class="about-stat-value">500+</span>
+                            <span class="about-stat-label">Active Students</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CONTACT SECTION ==================== -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Get In Touch</span>
+                <h2 class="section-title">Need Help? Contact Us</h2>
+                <p class="section-description">
+                    We're here to assist you with any questions or concerns
+                </p>
+            </div>
+            
+            <div class="contact-grid">
+                <div class="contact-info glass-card">
+                    <h3 class="contact-title">Contact Information</h3>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope" style="color: #03b5aa;"></i>
+                        </div>
+                        <div>
+                            <h4>Email</h4>
+                            <p>support@smartshopper.ac.za</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone" style="color: #ff8552;"></i>
+                        </div>
+                        <div>
+                            <h4>Phone</h4>
+                            <p>+27 31 123 4567</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt" style="color: #023436;"></i>
+                        </div>
+                        <div>
+                            <h4>Address</h4>
+                            <p>Durban University of Technology<br>Steve Biko Campus, Durban</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-form glass-card">
+                    <h3 class="contact-title">Send Us a Message</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="contactName">Your Name</label>
+                            <input type="text" id="contactName" name="name" required placeholder="Enter your full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactEmail">Email Address</label>
+                            <input type="email" id="contactEmail" name="email" required placeholder="your@dut4life.ac.za">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactMessage">Message</label>
+                            <textarea id="contactMessage" name="message" rows="4" required placeholder="How can we help you?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="brand-link">
+                        <i class="fas fa-robot brand-icon"></i>
+                        <span class="brand-text">Smart<span class="brand-highlight">Shopper</span></span>
+                    </a>
+                    <p class="footer-description">
+                        AI-powered shopping assistant for DUT students. Helping you budget smarter and 
+                        shop better.
+                    </p>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#" onclick="openTerms(event)">Terms & Conditions</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-social">
+                    <h4>Follow Us</h4>
+                    <div class="social-icons">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> SmartShopper AI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== MAIN JAVASCRIPT ==================== -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- ==================== PAGE-SPECIFIC JAVASCRIPT ==================== -->
+    <script>
+        // =============================================
+        // ======== PAGE-SPECIFIC FUNCTIONALITY ========
+        // =============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // ---------- NAVBAR TOGGLE ----------
+            const navbarToggle = document.getElementById('navbarToggle');
+            const navbarMenu = document.getElementById('navbarMenu');
+            
+            if (navbarToggle) {
+                navbarToggle.addEventListener('click', function() {
+                    const expanded = this.getAttribute('aria-expanded') === 'true' ? false : true;
+                    this.setAttribute('aria-expanded', expanded);
+                    navbarMenu.classList.toggle('active');
+                    
+                    // Animate toggle bars
+                    const bars = this.querySelectorAll('.toggle-bar');
+                    if (expanded) {
+                        bars[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+                        bars[1].style.opacity = '0';
+                        bars[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+                    } else {
+                        bars[0].style.transform = 'none';
+                        bars[1].style.opacity = '1';
+                        bars[2].style.transform = 'none';
+                    }
+                });
+            }
+            
+            // ---------- FLASH MESSAGES ----------
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                const closeBtn = message.querySelector('.flash-close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function() {
+                        message.style.opacity = '0';
+                        message.style.transform = 'translateY(-10px)';
+                        setTimeout(function() {
+                            message.remove();
+                        }, 300);
+                    });
+                }
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(function() {
+                    if (message) {
+                        message.style.opacity = '0';
+                        message.style.transform = 'translateY(-10px)';
+                        setTimeout(function() {
+                            if (message.parentNode) {
+                                message.remove();
+                            }
+                        }, 300);
+                    }
+                }, 5000);
+            });
+            
+            // ---------- ANIMATED STAT COUNTERS ----------
+            const statNumbers = document.querySelectorAll('.stat-number');
+            
+            const animateStats = function() {
+                statNumbers.forEach(function(stat) {
+                    const target = parseInt(stat.getAttribute('data-count'));
+                    const duration = 2000; // ms
+                    const startTime = performance.now();
+                    
+                    const updateCounter = function(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        
+                        // Ease out cubic
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        const current = Math.floor(eased * target);
+                        
+                        stat.textContent = current + (target > 100 ? '+' : '');
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            stat.textContent = target + (target > 100 ? '+' : '');
+                        }
+                    };
+                    
+                    requestAnimationFrame(updateCounter);
+                });
+            };
+            
+            // ---------- INTERSECTION OBSERVER FOR STATS ----------
+            const heroSection = document.getElementById('hero');
+            let statsAnimated = false;
+            
+            const statsObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting && !statsAnimated) {
+                        statsAnimated = true;
+                        animateStats();
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            if (heroSection) {
+                statsObserver.observe(heroSection);
+            }
+            
+            // ---------- CONTACT FORM ----------
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Basic validation
+                    const name = document.getElementById('contactName');
+                    const email = document.getElementById('contactEmail');
+                    const message = document.getElementById('contactMessage');
+                    
+                    let isValid = true;
+                    
+                    if (!name.value.trim()) {
+                        showFieldError(name, 'Name is required');
+                        isValid = false;
+                    } else {
+                        clearFieldError(name);
+                    }
+                    
+                    if (!email.value.trim()) {
+                        showFieldError(email, 'Email is required');
+                        isValid = false;
+                    } else if (!isValidEmail(email.value)) {
+                        showFieldError(email, 'Please enter a valid DUT email');
+                        isValid = false;
+                    } else {
+                        clearFieldError(email);
+                    }
+                    
+                    if (!message.value.trim()) {
+                        showFieldError(message, 'Message is required');
+                        isValid = false;
+                    } else {
+                        clearFieldError(message);
+                    }
+                    
+                    if (isValid) {
+                        // Simulate form submission
+                        const submitBtn = contactForm.querySelector('button[type="submit"]');
+                        const originalText = submitBtn.innerHTML;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                        submitBtn.disabled = true;
+                        
+                        setTimeout(function() {
+                            submitBtn.innerHTML = '<i class="fas fa-check"></i> Sent!';
+                            submitBtn.style.background = '#03b5aa';
+                            
+                            setTimeout(function() {
+                                submitBtn.innerHTML = originalText;
+                                submitBtn.disabled = false;
+                                submitBtn.style.background = '';
+                                contactForm.reset();
+                                showSuccessMessage('Thank you! We\'ll get back to you soon.');
+                            }, 2000);
+                        }, 1500);
+                    }
+                });
+            }
+            
+            // ---------- FORM HELPER FUNCTIONS ----------
+            function showFieldError(field, message) {
+                const formGroup = field.closest('.form-group');
+                const existingError = formGroup.querySelector('.field-error');
+                
+                if (existingError) {
+                    existingError.textContent = message;
+                } else {
+                    const error = document.createElement('span');
+                    error.className = 'field-error';
+                    error.style.cssText = 'color: #ff8552; font-size: 0.85rem; margin-top: 0.25rem; display: block;';
+                    error.textContent = message;
+                    formGroup.appendChild(error);
+                }
+                field.style.borderColor = '#ff8552';
+            }
+            
+            function clearFieldError(field) {
+                const formGroup = field.closest('.form-group');
+                const error = formGroup.querySelector('.field-error');
+                if (error) {
+                    error.remove();
+                }
+                field.style.borderColor = '';
+            }
+            
+            function isValidEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            function showSuccessMessage(message) {
+                const container = document.querySelector('.flash-container');
+                if (container) {
+                    const div = document.createElement('div');
+                    div.className = 'flash-message flash-success';
+                    div.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        ${message}
+                        <button class="flash-close" aria-label="Dismiss message">&times;</button>
+                    `;
+                    container.appendChild(div);
+                    
+                    const closeBtn = div.querySelector('.flash-close');
+                    closeBtn.addEventListener('click', function() {
+                        div.remove();
+                    });
+                    
+                    setTimeout(function() {
+                        div.remove();
+                    }, 5000);
+                }
+            }
+            
+            // ---------- TERMS & CONDITIONS POPUP ----------
+            window.openTerms = function(e) {
+                if (e) e.preventDefault();
+                
+                const termsWindow = window.open(
+                    '#',
+                    '_blank',
+                    'width=800,height=600,scrollbars=yes'
+                );
+                
+                // Write terms content
+                termsWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Terms & Conditions</title>
+                        <style>
+                            body {
+                                font-family: 'Inter', sans-serif;
+                                max-width: 800px;
+                                margin: 0 auto;
+                                padding: 2rem;
+                                line-height: 1.6;
+                                color: #333;
+                            }
+                            h1 { color: #023436; }
+                            h2 { color: #023436; margin-top: 2rem; }
+                            .highlight { color: #03b5aa; }
+                            .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; }
+                            .close-btn {
+                                background: #023436;
+                                color: white;
+                                border: none;
+                                padding: 0.5rem 1.5rem;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                font-size: 1rem;
+                            }
+                            .close-btn:hover { background: #03b5aa; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Terms & Conditions</h1>
+                        <p><strong>Last updated:</strong> ${new Date().toLocaleDateString()}</p>
+                        
+                        <h2>1. Introduction</h2>
+                        <p>Welcome to SmartShopper AI. By using our platform, you agree to these terms.</p>
+                        
+                        <h2>2. Eligibility</h2>
+                        <p>SmartShopper AI is exclusively for DUT students with valid DUT4Life email addresses.</p>
+                        
+                        <h2>3. Data Privacy</h2>
+                        <p>We collect minimal data to personalize your shopping experience. Your data is never shared with third parties without your explicit consent.</p>
+                        
+                        <h2>4. AI Recommendations</h2>
+                        <p>Our AI provides recommendations based on available data. Final purchasing decisions are your responsibility.</p>
+                        
+                        <h2>5. Acceptable Use</h2>
+                        <p>You agree to use SmartShopper AI responsibly and for personal use only.</p>
+                        
+                        <h2>6. Contact</h2>
+                        <p>For any questions, contact us at support@smartshopper.ac.za</p>
+                        
+                        <div class="footer">
+                            <button class="close-btn" onclick="window.close()">Close</button>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                termsWindow.document.close();
+            };
+            
+            // ---------- SET CURRENT YEAR ----------
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+        });
+    </script>
 </body>
 </html>
