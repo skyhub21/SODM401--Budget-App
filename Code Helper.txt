@@ -1,0 +1,59 @@
+==========TERMINAL========
+
+==Install Flask Framework==
+#1.Check Python Is available 
+python --version
+or:
+py --version
+
+#2.Create Virtual where "venvname" c
+python -m venv venvname 
+
+#3.Activate Virtual Environment
+venvname\Scripts\Activate.ps1
+or:
+venvname/bin/Activate.ps1
+or:
+source venvname/bin/activate
+
+
+#4.Upgrade pip
+python -m pip install --upgrade pip
+
+#5.Install Flask
+pip install Flask
+
+#6.Check Flask
+flask --version
+or:
+pip show Flask
+
+==Flask-SQLAlchemy==
+#Install SQLAlchemy
+pip install Flask-SQLAlchemy
+
+==Authentication==
+#Install Authlib Flask to support OAuth/OIDC login
+pip install Authlib
+
+#Install Requests
+pip install requests
+
+==python-dotenv==
+#Install Python dot Enviroment for .env file
+pip install python-dotenv
+
+===Save your installed packages===
+#Save all installed packages
+pip freeze > requirements.txt 
+
+#Install all saved packages
+pip install -r requirements.txt
+
+
+
+=============Extensions===
+python, python  Enviroment
+Autopep8
+Pylance
+SQLite3 Editor (by yy0931)

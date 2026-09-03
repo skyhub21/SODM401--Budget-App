@@ -1,0 +1,9 @@
+Created Python Virtual Environment
+Instaled Flask Framework
+Instaled SQLAlchemy
+install Python dot Enviroment
+Install Authlib for Flask to support OAuth/OIDC login
+
+Setup Folder structure
+
+Added Gmail Service Code
